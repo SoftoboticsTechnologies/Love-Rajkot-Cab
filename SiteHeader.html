@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="./support.js"></script></head>
+<body><x-dc><helmet><link rel="stylesheet" href="styles.css"><script src="_ds/_ds_bundle.js"></script><link rel="stylesheet" href="site.css"><script src="reveal.js"></script></helmet>
+<header class="site-header">
+  <div class="header-shell" data-pad>
+    <a class="brand" href="index.html" aria-label="LOVE Rajkot Cab home"><span class="brand-mark">LOVE</span><span><strong>LOVE RAJKOT CAB</strong><small>Taxi &amp; Outstation Service</small></span></a>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="index.html" aria-current="{{ curHome }}">Home</a><a href="Book-Now.html" aria-current="{{ curBook }}">Book Now</a><a href="Routes.html" aria-current="{{ curRoutes }}">Routes</a><a href="About-Us.html" aria-current="{{ curAbout }}">About Us</a><a href="Contact-Us.html" aria-current="{{ curContact }}">Contact Us</a>
+    </nav>
+    <a class="header-book" href="Inquire-Now.html">Inquire Now <span aria-hidden="true">↗</span></a>
+    <details class="mobile-nav"><summary aria-label="Open menu"><span></span><span></span><span></span></summary><nav aria-label="Mobile navigation"><a href="index.html">Home</a><a href="Book-Now.html">Book Now</a><a href="Routes.html">Routes</a><a href="About-Us.html">About Us</a><a href="Contact-Us.html">Contact Us</a><a href="Inquire-Now.html">Inquire Now</a></nav></details>
+  </div>
+  <div class="header-strip"><div data-pad><span>Rajkot, Gujarat</span><a href="tel:+918160260322">Call Now +91 8160260322</a></div></div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:150},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;book&quot;,&quot;routes&quot;,&quot;about&quot;,&quot;contact&quot;,&quot;inquire&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic { renderVals() { const a=this.props.active; return {curHome:a==='home'?'page':undefined,curBook:a==='book'?'page':undefined,curRoutes:a==='routes'?'page':undefined,curAbout:a==='about'?'page':undefined,curContact:a==='contact'?'page':undefined}; } }
+</script></body></html>

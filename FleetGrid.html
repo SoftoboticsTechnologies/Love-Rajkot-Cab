@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="styles.css">
+<script src="_ds/_ds_bundle.js"></script>
+<link rel="stylesheet" href="site.css">
+<script src="./image-slot.js"></script>
+<style>
+/* Fleet component owns its card geometry so page themes cannot hide its specifications. */
+.fleet-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:20px!important;background:transparent!important;border:0!important}
+.fleet-card{display:flex!important;min-width:0!important;min-height:0!important;overflow:hidden!important;border:0!important;border-radius:20px!important;background:#fff!important;color:#142235!important;box-shadow:0 10px 24px rgba(20,34,53,.10)!important;transition:transform .25s ease,box-shadow .25s ease!important}
+.fleet-card:hover{transform:translateY(-6px)!important;box-shadow:0 20px 38px rgba(20,34,53,.16)!important}
+.fleet-card .fleet-image{height:240px!important;min-height:240px!important;flex:none!important;overflow:hidden!important;border:0!important;background:#eaf0f5!important}
+.fleet-card .fleet-image image-slot{height:100%!important;transition:transform .45s ease!important}.fleet-card:hover .fleet-image image-slot{transform:scale(1.05)!important}
+.fleet-card .fleet-content{display:flex!important;flex:1 1 auto!important;min-height:0!important;padding:22px!important;color:#142235!important}
+.fleet-card h4,.fleet-card p,.fleet-card dt,.fleet-card dd,.fleet-card span{visibility:visible!important;color:#142235!important;opacity:1!important;line-height:1.35!important}
+.fleet-card h4{font-size:21px!important}.fleet-card p{color:#65758a!important;font-size:12px!important}
+.fleet-card dl{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0 16px!important;margin:14px 0 16px!important;border:0!important}
+.fleet-card dl>div{display:flex!important;min-height:36px!important;padding:8px 0!important;border-bottom:1px solid #e6edf2!important}
+.fleet-card dl>div:first-child{grid-column:1/-1!important;padding:11px 13px!important;border:0!important;border-radius:12px!important;background:#eaf1ff!important}
+.fleet-card dt{color:#718096!important;font-size:12px!important}.fleet-card dd{font-size:13px!important;font-weight:800!important}.fleet-card dl>div:first-child dd{color:#2563eb!important;font-size:17px!important}
+.fleet-card .btn{min-height:43px!important;padding:10px 11px!important;border-radius:11px!important;font-size:11px!important}
+@media(max-width:900px){.fleet-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:600px){.fleet-grid{grid-template-columns:1fr!important}.fleet-card .fleet-image{height:215px!important;min-height:215px!important}.fleet-card dl{grid-template-columns:1fr!important}}
+</style>
+</helmet>
+<div class="fleet-grid" data-cols="3" style="background:var(--color-divider);border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)">
+  <sc-for list="{{ cars }}" as="car" hint-placeholder-count="6">
+    <article class="fleet-card" data-reveal style="background:var(--color-bg);padding:0;display:flex;flex-direction:column">
+      <div class="fleet-image grayscale" style="position:relative;height:196px;background:var(--color-surface);border-bottom:1px solid var(--color-divider)">
+        <image-slot id="{{ car.slot }}" shape="rect" fit="cover" src="{{ car.src }}" credit="{{ car.credit }}" credit-href="{{ car.creditHref }}" placeholder="{{ car.ph }}"></image-slot>
+      </div>
+      <div class="fleet-content" style="padding:clamp(18px,2vw,26px);display:flex;flex-direction:column;flex:1">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:4px">
+          <h4 style="margin:0;font-size:18px;line-height:1.1;flex:1">{{ car.name }}</h4>
+          <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;white-space:nowrap;padding-top:3px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--color-accent)" stroke="none"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"></path></svg>
+            {{ car.rating }}
+          </span>
+        </div>
+        <p style="margin:0 0 16px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;font-weight:600">{{ car.seats }}</p>
+        <dl style="margin:0 0 20px;display:grid;gap:0;border-top:1px solid var(--color-divider)">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+            <dt style="opacity:.6">Rate per km</dt>
+            <dd style="margin:0;font-family:var(--font-heading);font-weight:800;color:var(--color-accent-700)">{{ car.rate }}</dd>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+            <dt style="opacity:.6">Minimum km</dt>
+            <dd style="margin:0;font-weight:600">{{ car.minKm }}</dd>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+            <dt style="opacity:.6">Driver allowance</dt>
+            <dd style="margin:0;font-weight:600">{{ car.driver }}</dd>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px">
+            <dt style="opacity:.6">Toll &amp; parking</dt>
+            <dd style="margin:0;font-weight:600">Extra, as actual</dd>
+          </div>
+        </dl>
+        <div style="margin-top:auto;display:grid;gap:2px">
+          <a href="{{ car.wa }}" target="_blank" rel="noopener" class="btn btn-primary" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;gap:10px">
+            Book Now
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+          </a>
+          <a href="tel:+918160260322" class="btn" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;gap:10px;border:2px solid var(--color-divider)" style-hover="border-color:var(--color-accent);color:var(--color-accent)">
+            Call for fare
+          </a>
+        </div>
+      </div>
+    </article>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:760},&quot;slotPrefix&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;fleet&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const FLEET = [
+  { name: 'Maruti Dzire', seats: 'Sedan · 4 + 1 seater · AC', rate: '₹11 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.8' },
+  { name: 'Maruti WagonR', seats: 'Sedan · 4 + 1 seater · AC', rate: '₹12 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.7' },
+  { name: 'Maruti Ertiga', seats: 'SUV · 6 + 1 seater · AC', rate: '₹15 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.7' },
+  { name: 'Toyota Innova', seats: 'SUV · 6 + 1 seater · AC', rate: '₹17 / km', minKm: '300 km per day', driver: '₹600 per day', rating: '4.8' },
+  { name: 'Maruti Swift', seats: 'SUV · 6 + 1 seater · AC', rate: '₹19 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.9' },
+  { name: 'Tempo Traveller', seats: 'Van · 13 + 1 seater · AC', rate: '₹28 / km', minKm: '300 km per day', driver: '₹600 per day', rating: '4.6' },
+];
+
+const MEDIA = [
+  {
+    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Dzire-Tour-S/12461/1762857975456/front-left-side-47.jpg",
+    "credit": "",
+    "href": ""
+  },
+  {
+    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Wagon-R/13615/1780657439669/front-view-118.jpg",
+    "credit": "",
+    "href": ""
+  },
+  {
+    "src": "https://stimg.cardekho.com/images/car-images/930x620/Maruti/Ertiga/10288/1760527558211/Arctic-White_c5c5c5.jpg",
+    "credit": "",
+    "href": ""
+  },
+  {
+    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Innova-Crysta/11703/1780562393141/front-left-side-47.jpg",
+    "credit": "",
+    "href": ""
+  },
+  {
+    "src": "https://stimg.cardekho.com/images/car-images/930x620/Maruti/Swift/9226/1747045535143/230_Pearl-Arctic-White_e8e8e8.jpg",
+    "credit": "",
+    "href": ""
+  },
+  {
+    "src": "https://yathvikatravels.com/wp-content/uploads/2025/12/WhatsApp-Image-2025-12-03-at-1.00.01-PM.jpeg",
+    "credit": "",
+    "href": ""
+  }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const prefix = this.props.slotPrefix ?? 'fleet';
+    return {
+      cars: FLEET.map((c, i) => ({
+        ...c,
+        slot: prefix + '-car-' + i,
+        src: MEDIA[i].src,
+        credit: MEDIA[i].credit,
+        creditHref: MEDIA[i].href,
+        ph: 'Drop a photo of the ' + c.name,
+        wa: 'https://wa.me/918160260322?text=' + encodeURIComponent('Hi LOVE Rajkot Cab, I want to book a ' + c.name + '. Please share the fare.'),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>
