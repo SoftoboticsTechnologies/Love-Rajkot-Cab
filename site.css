@@ -333,13 +333,8 @@ main [data-route-row] { margin-bottom:10px; padding:18px 20px !important; border
 .loc-media { position:relative; height:0; padding-bottom:126%; background:var(--color-neutral-200); overflow:hidden; }
 .loc-media image-slot { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; transition:transform .6s ease; }
 .loc-card:hover .loc-media image-slot { transform:scale(1.08); }
-.loc-slideshow { position:absolute; inset:0; }
-.loc-slideshow img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; animation:locSlideshow 15s infinite; animation-fill-mode:both; transition:transform .6s ease; }
-.loc-slideshow img:nth-child(1) { animation-delay:0s; }
-.loc-slideshow img:nth-child(2) { animation-delay:5s; }
-.loc-slideshow img:nth-child(3) { animation-delay:10s; }
-.loc-card:hover .loc-slideshow img { transform:scale(1.08); }
-@keyframes locSlideshow { 0%{opacity:0} 4%{opacity:1} 28%{opacity:1} 33%{opacity:0} 100%{opacity:0} }
+.loc-media img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s ease; }
+.loc-card:hover .loc-media img { transform:scale(1.08); }
 .loc-media::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,20,17,0) 30%,rgba(6,20,17,.6) 66%,rgba(4,14,12,.94) 100%); }
 .loc-badge { position:absolute; z-index:2; top:16px; left:16px; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4); backdrop-filter:blur(6px); color:#fff; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
 .loc-credit { position:absolute; z-index:2; top:16px; right:16px; font-size:9px; letter-spacing:.02em; color:rgba(255,255,255,.55); }
