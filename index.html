@@ -15,32 +15,238 @@
 <link rel="stylesheet" href="site.css">
 <script src="reveal.js"></script>
 <script src="./image-slot.js"></script>
+<style>
+/* Hero image carousel: full-bleed slides, overrides the old single-image hero card. */
+.page-home > section.hero-carousel:first-child,
+.page-home > .home-hero.hero-carousel {
+  isolation:isolate; padding:0!important; margin:0!important; max-width:none!important;
+  width:100%!important; min-height:auto!important; display:block!important;
+  align-items:initial!important; overflow:hidden; background:#0b1c2f!important;
+}
+.page-home > .home-hero.hero-carousel::before { display:none!important; }
+.hero-carousel-track { position:relative; width:100%; min-height:clamp(560px,82vh,760px); }
+/* Autoplays with a pure-CSS keyframe loop (same technique as .loc-slideshow elsewhere on
+   this site) so the slideshow always runs with no JavaScript at all. Each slide gets 1/3 of a
+   15s loop (5s visible) via a staggered animation-delay. pointer-events stays "auto" on every
+   slide at all times (never toggled) — only z-index is animated, so the currently-visible slide
+   is always the one stacked on top and fully covers its siblings; that's what makes its
+   buttons/arrows receive clicks, not a fragile pointer-events timing window. This is also why
+   the buttons used to stop responding except right when the image changed: with pointer-events
+   toggled by keyframe percentage, a tiny misalignment between slides left moments where the
+   visible slide had pointer-events:none while an invisible sibling (stacked in front of it in
+   DOM/paint order) still had pointer-events:auto and silently absorbed the click. Stacking order
+   alone now decides which slide is clickable, so there's no timing window to fall into.
+   The prev/next arrows and dots are plain anchor links to each slide's #id; :target + :has()
+   (also pure CSS, no JS) freezes the loop on whichever slide the visitor jumped to. */
+.hero-slide { position:absolute; inset:0; opacity:0; z-index:0; animation:heroSlideshow 15s infinite; }
+.hero-slide:nth-of-type(1) { animation-delay:0s; }
+.hero-slide:nth-of-type(2) { animation-delay:5s; }
+.hero-slide:nth-of-type(3) { animation-delay:10s; }
+@keyframes heroSlideshow {
+  0%   { opacity:0; z-index:0; }
+  4%   { opacity:1; z-index:2; }
+  28%  { opacity:1; z-index:2; }
+  33%  { opacity:0; z-index:2; }
+  34%  { z-index:0; }
+  100% { opacity:0; z-index:0; }
+}
+/* Once any slide has been jumped to via an arrow/dot link, stop the loop and show only that slide. */
+.hero-carousel-track:has(.hero-slide:target) .hero-slide { animation:none!important; opacity:0!important; z-index:0!important; }
+.hero-carousel-track:has(.hero-slide:target) .hero-slide:target { opacity:1!important; z-index:5!important; }
+.hero-slide-bg { position:absolute; inset:0; }
+.hero-slide-bg image-slot { position:absolute!important; inset:0!important; width:100%!important; height:100%!important; }
+.hero-slide-scrim { position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,15,28,.58) 0%,rgba(6,15,28,.4) 42%,rgba(6,15,28,.78) 100%); }
+.hero-slide-copy { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:96px 24px 64px; max-width:760px; margin:0 auto; }
+.hero-slide-kicker { margin:0 0 14px; color:#8fc4ff; font-weight:800; font-size:13px; letter-spacing:.16em; text-transform:uppercase; }
+.hero-slide-heading { margin:0 0 18px; font-size:clamp(34px,5.6vw,64px); line-height:1.08; font-weight:800; color:#fff; }
+.hero-slide-heading span { display:block; }
+.hero-slide-heading .is-accent { color:var(--color-accent-400); }
+.hero-slide-sub { margin:0 0 32px; max-width:56ch; font-size:clamp(15px,1.4vw,18px); line-height:1.6; color:rgba(255,255,255,.86); }
+.hero-slide-actions { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
+.hero-slide-btn { padding:16px 26px!important; font-size:13px!important; letter-spacing:.07em!important; text-transform:uppercase!important; gap:10px!important; }
+.hero-slide-btn.btn-primary:hover { background:#38bdf8!important; box-shadow:0 10px 26px rgba(56,189,248,.4)!important; }
+.hero-slide-btn-white { background:#fff!important; color:#142235!important; border-color:transparent!important; }
+.hero-slide-btn-white:hover { background:#38bdf8!important; color:#fff!important; }
+/* Prev/next are anchor links duplicated inside EACH slide (each pointing at its own correct
+   neighbour's #id) so only the currently-visible slide's pair is interactive at a time — no JS. */
+.hero-carousel-arrow { position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:46px; height:46px; display:grid; place-items:center; border:0; border-radius:50%; background:rgba(10,20,35,.42); color:#fff; cursor:pointer; text-decoration:none; backdrop-filter:blur(4px); transition:background .18s ease; }
+.hero-carousel-arrow:hover { background:rgba(10,20,35,.68); }
+.hero-carousel-arrow-prev { left:clamp(12px,3vw,32px); }
+.hero-carousel-arrow-next { right:clamp(12px,3vw,32px); }
+.hero-carousel-dots { position:absolute; left:50%; bottom:clamp(16px,3vw,28px); transform:translateX(-50%); z-index:3; display:flex; gap:8px; }
+.hero-carousel-dot { width:9px; height:9px; padding:0; border:0; border-radius:50%; background:rgba(255,255,255,.4); cursor:pointer; text-decoration:none; transition:background .18s ease,transform .18s ease; }
+.hero-carousel-dot.is-active { background:#fff; transform:scale(1.25); }
+.hero-carousel-track:has(.hero-slide:target) .hero-carousel-dot { background:rgba(255,255,255,.4); transform:none; }
+.hero-carousel-track:has(#hero-slide-1:target) .hero-carousel-dot[href="#hero-slide-1"],
+.hero-carousel-track:has(#hero-slide-2:target) .hero-carousel-dot[href="#hero-slide-2"],
+.hero-carousel-track:has(#hero-slide-3:target) .hero-carousel-dot[href="#hero-slide-3"] { background:#fff; transform:scale(1.25); }
+@media (max-width:640px) { .hero-carousel-track { min-height:560px; } .hero-carousel-arrow { width:38px; height:38px; } .hero-slide-copy { padding:84px 18px 56px; } }
+
+/* Wide taxi-booking bar: overlaps the hero's bottom edge. */
+.taxi-book-wrap { position:relative; z-index:4; width:min(1140px,calc(100% - 32px)); margin:clamp(-96px,-9vw,-56px) auto 0; }
+.taxi-book-card { padding:clamp(26px,3vw,38px) clamp(24px,3.2vw,42px); border-radius:24px; background:#fff; box-shadow:0 26px 60px rgba(15,28,45,.18); }
+.taxi-book-card h3 { margin:0 0 22px; font-size:clamp(22px,2.4vw,28px); font-weight:800; color:#0f172a; }
+.taxi-book-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px 20px; }
+.taxi-book-field label { display:block; margin:0 0 8px; font-size:12.5px; font-weight:700; color:#334155; }
+.taxi-book-field .control { position:relative; }
+.taxi-book-field input, .taxi-book-field select {
+  display:block; width:100%; height:50px; padding:0 42px 0 16px; border:1px solid #dfe6ee; border-radius:12px;
+  background:#f8fafc; color:#17263a; font:14px/1.3 inherit; appearance:none;
+}
+.taxi-book-field select { cursor:pointer; }
+.taxi-book-field input::placeholder { color:#9aa8b8; }
+.taxi-book-field input:focus-visible, .taxi-book-field select:focus-visible { outline:0; border-color:var(--color-accent); box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+.taxi-book-field .field-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:#9aa8b8; pointer-events:none; }
+.taxi-book-actions { display:flex; justify-content:flex-end; margin-top:22px; }
+.taxi-book-actions .btn-primary { padding:15px 30px!important; font-size:13px!important; letter-spacing:.07em!important; text-transform:uppercase!important; gap:10px!important; }
+@media (max-width:900px) { .taxi-book-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:560px) { .taxi-book-grid { grid-template-columns:1fr; } .taxi-book-wrap { margin-top:-40px; } .taxi-book-actions { justify-content:stretch; } .taxi-book-actions .btn-primary { width:100%; } }
+
+.taxi-book-thanks-overlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(13,20,34,.6); backdrop-filter:blur(4px); }
+.taxi-book-thanks-card { position:relative; width:min(100%,420px); background:#fff; color:#17263a; border-radius:22px; padding:40px 32px 32px; text-align:center; box-shadow:0 30px 70px rgba(8,15,30,.35); }
+.taxi-book-thanks-close { position:absolute; top:14px; right:14px; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border:0; border-radius:50%; background:#f1f5f9; color:#64748b; font-size:18px; line-height:1; cursor:pointer; }
+.taxi-book-thanks-close:hover { background:#e2e8f0; color:#17263a; }
+.taxi-book-thanks-icon { display:grid; place-items:center; width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; }
+.taxi-book-thanks-card h4 { margin:0 0 10px; font-size:24px; font-weight:800; color:#0f172a; }
+.taxi-book-thanks-card p { margin:0 0 8px; font-size:15px; line-height:1.5; color:#0f172a; }
+.taxi-book-thanks-card p.note { font-size:13px; color:#64748b; }
+</style>
 </helmet>
 <div style="background:var(--color-bg)">
   <dc-import name="SiteHeader" active="home" hint-size="100%,120px"></dc-import>
 
   <main class="page-home">
-    <!-- HERO -->
-    <section class="home-hero" data-pad style="max-width:1440px;margin:0 auto;padding-top:clamp(40px,5vw,76px);padding-bottom:clamp(40px,5vw,72px)">
-      <div class="hero-media" aria-hidden="true"><image-slot id="home-hero-drive" fit="cover" src="uploads/bg%20image.png" placeholder="Drop a wide photo of your car and driver"></image-slot></div>
-      <div data-hero class="hero-copy" style="gap:clamp(36px,4vw,64px);align-items:start">
-        <div>
-          <h1 data-t="display" style="margin:0 0 22px;max-width:18ch">Rajkot's own cab. Ready when you are.</h1>
-          <p style="margin:0 0 30px;font-size:clamp(16px,1.4vw,19px);line-height:1.6;max-width:52ch;opacity:.78">Local trips across Rajkot and fixed-fare outstation runs to Dwarka, Somnath, Junagadh and Ahmedabad. One call, a clean car, a driver who knows the road.</p>
-          <div class="hero-actions">
-            <a href="tel:+918160260322" class="btn btn-primary">Call Now</a>
-            <a data-wa href="https://wa.me/918160260322?text=Hi%20LOVE%20Rajkot%20Cab%2C%20I%20would%20like%20to%20book%20a%20taxi." target="_blank" rel="noopener" class="btn" aria-label="Chat with LOVE Rajkot Cab on WhatsApp">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="flex:none"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.9-.95 1.09-.17.2-.35.21-.65.07-.3-.15-1.13-.42-2.15-1.33-.79-.71-1.32-1.58-1.47-1.88-.15-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1.01-1.03 2.46 0 1.45 1.05 2.85 1.2 3.05.15.2 2.06 3.28 5.06 4.47.71.28 1.26.45 1.69.58.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z"></path><path d="M12.02 2C6.5 2 2.03 6.47 2.03 11.99c0 1.76.46 3.42 1.27 4.86L2 22.5l5.79-1.51a9.94 9.94 0 0 0 4.23.95h.01c5.51 0 9.99-4.48 9.99-10S17.53 2 12.02 2Zm0 18.13h-.01a8.2 8.2 0 0 1-3.9-1l-.28-.16-3.44.9.92-3.35-.18-.29a8.1 8.1 0 0 1-1.25-4.34 8.15 8.15 0 0 1 8.15-8.14c2.18 0 4.22.85 5.76 2.39a8.09 8.09 0 0 1 2.38 5.76 8.15 8.15 0 0 1-8.15 8.14Z"></path></svg>
-            </a>
+    <!-- HERO CAROUSEL (pure CSS: keyframe autoplay + anchor/:target nav, no JS needed) -->
+    <section class="home-hero hero-carousel">
+      <div class="hero-carousel-track">
+        <div class="hero-slide" id="hero-slide-1">
+          <div class="hero-slide-bg" aria-hidden="true"><image-slot id="home-hero-slide-1" fit="cover" src="images/taxi2.png" placeholder="Drop a wide taxi photo"></image-slot></div>
+          <div class="hero-slide-scrim"></div>
+          <a href="#hero-slide-3" class="hero-carousel-arrow hero-carousel-arrow-prev" aria-label="Previous slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+          <a href="#hero-slide-2" class="hero-carousel-arrow hero-carousel-arrow-next" aria-label="Next slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+          <div class="hero-slide-copy">
+            <p class="hero-slide-kicker">Welcome to LOVE Rajkot Cab!</p>
+            <h1 class="hero-slide-heading"><span>Quick and Easy</span><span class="is-accent">Taxi Booking</span></h1>
+            <p class="hero-slide-sub">Book a ride instantly across Rajkot and Saurashtra with just a few clicks &mdash; local runs and fixed-fare outstation trips.</p>
+            <div class="hero-slide-actions">
+              <a href="Book-Now.html" class="btn btn-primary hero-slide-btn">Book Now<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+              <a href="#fleet" class="btn hero-slide-btn hero-slide-btn-white">Learn More<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+            </div>
           </div>
         </div>
-        <div class="premium-booking-wrapper" style="display:flex;justify-content:flex-end;">
-          <div style="width:100%;max-width:520px">
-            <dc-import name="BookForm" kicker="Book a ride" heading="Book Your Taxi" note="Share your trip details and we'll confirm your fare within minutes by email." cta="Inquire Now" hint-size="100%,520px"></dc-import>
+        <div class="hero-slide" id="hero-slide-2">
+          <div class="hero-slide-bg" aria-hidden="true"><image-slot id="home-hero-slide-2" fit="cover" src="images/coverimage.png" placeholder="Drop a wide taxi photo"></image-slot></div>
+          <div class="hero-slide-scrim"></div>
+          <a href="#hero-slide-1" class="hero-carousel-arrow hero-carousel-arrow-prev" aria-label="Previous slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+          <a href="#hero-slide-3" class="hero-carousel-arrow hero-carousel-arrow-next" aria-label="Next slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+          <div class="hero-slide-copy">
+            <p class="hero-slide-kicker">Welcome to LOVE Rajkot Cab!</p>
+            <h1 class="hero-slide-heading"><span>Safe Rides,</span><span class="is-accent">Happy Journeys</span></h1>
+            <p class="hero-slide-sub">Fixed fares, verified drivers and a clean car for every trip &mdash; day or night, across the city or out of town.</p>
+            <div class="hero-slide-actions">
+              <a href="Book-Now.html" class="btn btn-primary hero-slide-btn">Book Now<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+              <a href="#fleet" class="btn hero-slide-btn hero-slide-btn-white">Learn More<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+            </div>
           </div>
+        </div>
+        <div class="hero-slide" id="hero-slide-3">
+          <div class="hero-slide-bg" aria-hidden="true"><image-slot id="home-hero-slide-3" fit="cover" src="images/bg%20image.png" placeholder="Drop a wide taxi photo"></image-slot></div>
+          <div class="hero-slide-scrim"></div>
+          <a href="#hero-slide-2" class="hero-carousel-arrow hero-carousel-arrow-prev" aria-label="Previous slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
+          <a href="#hero-slide-1" class="hero-carousel-arrow hero-carousel-arrow-next" aria-label="Next slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+          <div class="hero-slide-copy">
+            <p class="hero-slide-kicker">Welcome to LOVE Rajkot Cab!</p>
+            <h1 class="hero-slide-heading"><span>Comfortable Cars,</span><span class="is-accent">Every Kilometre</span></h1>
+            <p class="hero-slide-sub">Working AC, clean interiors and courteous drivers on every trip &mdash; across Rajkot and the wider Saurashtra circuit.</p>
+            <div class="hero-slide-actions">
+              <a href="Book-Now.html" class="btn btn-primary hero-slide-btn">Book Now<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+              <a href="#fleet" class="btn hero-slide-btn hero-slide-btn-white">Learn More<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+            </div>
+          </div>
+        </div>
+        <div class="hero-carousel-dots" aria-label="Choose slide">
+          <a href="#hero-slide-1" class="hero-carousel-dot is-active" aria-label="Slide 1"></a>
+          <a href="#hero-slide-2" class="hero-carousel-dot" aria-label="Slide 2"></a>
+          <a href="#hero-slide-3" class="hero-carousel-dot" aria-label="Slide 3"></a>
         </div>
       </div>
-      <div class="hero-trust" data-cols="4" style="margin-top:clamp(40px,5vw,72px);gap:0;border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)">
+    </section>
+
+    <!-- BOOK A RIDE + TRUST STRIP -->
+    <section class="home-hero-extras" data-pad data-sec style="max-width:1440px;margin:0 auto;order:1;padding-bottom:clamp(48px,6vw,80px)">
+      <div class="taxi-book-wrap">
+        <div class="taxi-book-card">
+          <h3>Book a Taxi Now</h3>
+          <form id="taxi-book-form">
+            <div class="taxi-book-grid">
+              <div class="taxi-book-field">
+                <label for="tb-name">Your Name</label>
+                <div class="control">
+                  <input class="input" id="tb-name" name="name" required placeholder="Your Name">
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"></path></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-phone">Contact Number</label>
+                <div class="control">
+                  <input class="input" id="tb-phone" name="phone" type="tel" required inputmode="numeric" pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" placeholder="Contact Number">
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"></path></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-email">Email Address</label>
+                <div class="control">
+                  <input class="input" id="tb-email" name="email" type="email" required placeholder="Email Address">
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-vehicle">Select Vehicle</label>
+                <div class="control">
+                  <select class="input" id="tb-vehicle" name="vehicle" required>
+                    <option value="" selected disabled>Select Car</option>
+                    <option>Maruti Suzuki Dzire</option>
+                    <option>Honda Amaze</option>
+                    <option>Maruti Suzuki Ertiga</option>
+                    <option>Toyota Innova</option>
+                    <option>Chevrolet Tavera</option>
+                    <option>Tempo Traveller</option>
+                  </select>
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-pickup">Pick Up Location</label>
+                <div class="control">
+                  <input class="input" id="tb-pickup" name="pickup" required autocomplete="street-address" placeholder="Type Location">
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10c0-4.4 3.6-8 8-8s8 3.6 8 8Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-drop">Drop Off Location</label>
+                <div class="control">
+                  <input class="input" id="tb-drop" name="drop" required autocomplete="off" placeholder="Type Location">
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10c0-4.4 3.6-8 8-8s8 3.6 8 8Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+              </div>
+              <div class="taxi-book-field">
+                <label for="tb-date">Pick Up Date</label>
+                <div class="control">
+                  <input class="input" id="tb-date" name="date" type="date" required>
+                  <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg>
+                </div>
+              </div>
+            </div>
+            <div class="taxi-book-actions">
+              <button type="submit" class="btn btn-primary">
+                Book Now
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div data-cols="4" style="margin-top:clamp(48px,6vw,80px);gap:0;border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)">
         <div style="padding:22px 24px 22px 0;border-right:1px solid var(--color-divider)">
           <h5 style="margin:0 0 4px;font-size:15px">Fixed fares</h5>
           <p style="margin:0;font-size:13px;opacity:.6">Agreed before departure</p>
@@ -60,13 +266,11 @@
       </div>
     </section>
 
-    
-
     <!-- BEST TAXI SERVICE -->
     <section class="home-intro" data-pad data-sec style="max-width:1440px;margin:0 auto">
       <div data-split style="gap:clamp(32px,4vw,64px);align-items:center">
         <div class="grayscale" data-reveal style="position:relative;aspect-ratio:5/3;background:var(--color-surface);border:2px solid var(--color-text)">
-          <image-slot id="home-best" fit="cover" src="uploads/coverimage.png" placeholder="Drop a photo of your car and driver"></image-slot>
+          <image-slot id="home-best" fit="cover" src="images/coverimage.png" placeholder="Drop a photo of your car and driver"></image-slot>
         </div>
         <div data-reveal>
           <h6 style="margin:0 0 12px;color:var(--color-accent)">Best taxi service in Rajkot</h6>
@@ -288,7 +492,7 @@
       
     </section> -->
 
-  <section style="background:var(--color-accent);color:var(--color-bg)">
+  <section class="home-wherever" style="background:var(--color-accent);color:var(--color-bg);order:21">
       <div data-pad style="max-width:1440px;margin:0 auto;padding-top:clamp(44px,5vw,72px);padding-bottom:clamp(44px,5vw,72px);display:flex;flex-wrap:wrap;align-items:center;gap:24px 40px">
         <!-- <h6 style="margin:0 0 18px;opacity:.8">24 &times; 7 pickup</h6> -->
         <h2 data-t="h1" style="margin:0;flex:1;min-width:min(100%,20ch)">Wherever you are in Rajkot, the car can be there.</h2>
@@ -310,30 +514,71 @@
         <p>Safe, reliable and comfortable rides &ndash; anytime, anywhere.</p>
       </div>
       <div class="services-grid">
-        <article class="service-card" data-reveal>
-          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"></path><path d="M17 5.1c-1.8-.4-3.5-.6-5-.6s-3.2.2-5 .6"></path><path d="M5 5.1 3.8 8.2C2.6 8.6 2 9.1 2 10v3c0 1 .8 2 2 2v3c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-1h10v1c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-3c1.2 0 2-1 2-2v-3c0-.9-.6-1.4-1.8-1.8L17 5.1"></path><path d="M7 14h.01"></path><path d="M17 14h.01"></path><path d="M9 9h6"></path></svg></span>
-          <h3>Taxi Service in Rajkot</h3>
-          <p>Local rides, station and airport transfers across the city.</p>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-outstation" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Road%20Trip.JPG?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Road_Trip.JPG" placeholder="Drop an outstation cab photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10c0-4.4 3.6-8 8-8s8 3.6 8 8Z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>Outstation Cabs</h3>
+            <p>Travel to any city from Rajkot with LOVE Rajkot Cab. Affordable and comfortable outstation cabs for your journey.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
         </article>
-        <article class="service-card" data-reveal>
-          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg></span>
-          <h3>Outstation Taxi Services</h3>
-          <p>One-way drops across Gujarat, Rajasthan and Maharashtra.</p>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-airport" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/A%20TX4%20Taxi%20at%20Heathrow%20Airport%20Terminal%205.jpg?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:A_TX4_Taxi_at_Heathrow_Airport_Terminal_5.jpg" placeholder="Drop an airport transfer photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.5v-2l-8.5-5V4a1.5 1.5 0 0 0-3 0v5.5L2 14.5v2l8.5-2.6V19l-2.5 1.8V22l3.5-1 3.5 1v-1.2L13 19v-5.1l9 2.6Z"></path></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>Airport Cabs</h3>
+            <p>We provide hassle-free airport transfers in Rajkot. Our experienced drivers pick you up and drop you off on time.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
         </article>
-        <article class="service-card" data-reveal>
-          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></span>
-          <h3>Round-trip Cab Service</h3>
-          <p>Same-day or multi-day returns, one driver throughout.</p>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-local" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Calcutta%20Yellow%20Taxi.JPG?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Calcutta_Yellow_Taxi.JPG" placeholder="Drop a local city cab photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"></path><path d="M17 5.1c-1.8-.4-3.5-.6-5-.6s-3.2.2-5 .6"></path><path d="M5 5.1 3.8 8.2C2.6 8.6 2 9.1 2 10v3c0 1 .8 2 2 2v3c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-1h10v1c0 .5.5 1 1 1h1c.5 0 1-.5 1-1v-3c1.2 0 2-1 2-2v-3c0-.9-.6-1.4-1.8-1.8L17 5.1"></path><path d="M7 14h.01"></path><path d="M17 14h.01"></path><path d="M9 9h6"></path></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>Local Cabs</h3>
+            <p>Need a taxi to explore the city? Our local cabs are at your service 24/7 &ndash; choose from a variety of cars.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
         </article>
-        <article class="service-card" data-reveal>
-          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.5"></path><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><circle cx="16" cy="16" r="6"></circle><path d="M16 14v2l1 1"></path></svg></span>
-          <h3>Full-Day Taxi Hire</h3>
-          <p>8 or 12-hour hire with kilometres included.</p>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-oneway" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Taxis%20driving%20by.jpg?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Taxis_driving_by.jpg" placeholder="Drop a one-way cab photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13"></path><path d="m13 7 5 5-5 5"></path></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>One-way Cabs</h3>
+            <p>Planning a one-way trip from Rajkot? Book a one-way cab with LOVE Rajkot Cab and save on your travel expenses.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
         </article>
-        <article class="service-card" data-reveal>
-          <span class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M22 16.5v-2l-8.5-5V4a1.5 1.5 0 0 0-3 0v5.5L2 14.5v2l8.5-2.6V19l-2.5 1.8V22l3.5-1 3.5 1v-1.2L13 19v-5.1l9 2.6Z"></path></svg></span>
-          <h3>Airport Taxi Services</h3>
-          <p>Flight-tracked pickups at Rajkot and Ahmedabad airports.</p>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-corporate" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Chauffeur%20de%20taxi.jpg?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Chauffeur_de_taxi.jpg" placeholder="Drop a corporate cab photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4.5"></path><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><circle cx="16" cy="16" r="6"></circle><path d="M16 14v2l1 1"></path></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>Corporate Cabs</h3>
+            <p>We understand the importance of punctuality for corporate travel. Our cabs are designed to fit your business needs.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
+        </article>
+        <article class="svc-card" data-reveal>
+          <div class="svc-media">
+            <image-slot id="home-svc-wedding" fit="cover" src="https://commons.wikimedia.org/wiki/Special:FilePath/Turkmen%20Decorated%20wedding%20car.jpg?width=1600" credit="Wikimedia Commons" credit-href="https://commons.wikimedia.org/wiki/File:Turkmen_Decorated_wedding_car.jpg" placeholder="Drop a wedding cab photo"></image-slot>
+            <span class="svc-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21s-8-4.6-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.4-8 11-8 11Z"></path></svg></span>
+          </div>
+          <div class="svc-body">
+            <h3>Wedding Cabs</h3>
+            <p>Make your special day even more memorable with LOVE Rajkot Cab and a hassle-free wedding transportation.</p>
+            <a href="Book-Now.html" class="btn btn-primary svc-btn">Book Now<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+          </div>
         </article>
       </div>
     </section>
@@ -342,6 +587,70 @@
   <dc-import name="SiteFooter" hint-size="100%,460px"></dc-import>
   <dc-import name="StickyCall" hint-size="0px,0px"></dc-import>
 </div>
+<script>
+(function () {
+  var form = document.getElementById('taxi-book-form');
+  if (!form) return;
+  function showThanks() {
+    var overlay = document.createElement('div');
+    overlay.className = 'taxi-book-thanks-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Booking request sent');
+    overlay.innerHTML =
+      '<div class="taxi-book-thanks-card">' +
+        '<button type="button" class="taxi-book-thanks-close" aria-label="Close">&times;</button>' +
+        '<div class="taxi-book-thanks-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></div>' +
+        '<h4>Thank You!</h4>' +
+        '<p>Your booking request is ready to send on email.</p>' +
+        '<p>We&#39;ll call you back shortly.</p>' +
+        '<p class="note">Usually within ten minutes, day or night. Nothing is charged until you agree the fare.</p>' +
+      '</div>';
+    var close = function () { overlay.remove(); };
+    overlay.addEventListener('click', function (ev) { if (ev.target === overlay) close(); });
+    overlay.querySelector('.taxi-book-thanks-close').addEventListener('click', close);
+    document.body.appendChild(overlay);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var f = new FormData(form);
+    var g = function (k) { return (f.get(k) || '').toString().trim(); };
+    if (submitBtn) submitBtn.disabled = true;
+    var mailBody =
+      'Name: ' + g('name') + '\n' +
+      'Phone: ' + g('phone') + '\n' +
+      'Email: ' + g('email') + '\n' +
+      'Vehicle: ' + g('vehicle') + '\n' +
+      'Pickup: ' + g('pickup') + '\n' +
+      'Drop: ' + g('drop') + '\n' +
+      'Date: ' + g('date');
+    window.location.href = 'mailto:Loverajkot05@gmail.com?subject=' + encodeURIComponent('New Taxi Booking Request') + '&body=' + encodeURIComponent(mailBody);
+    fetch('https://formsubmit.co/ajax/Loverajkot05@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: 'New Taxi Booking Request',
+        _template: 'table',
+        Name: g('name'),
+        Phone: g('phone'),
+        Email: g('email'),
+        Vehicle: g('vehicle'),
+        Pickup: g('pickup'),
+        Drop: g('drop'),
+        Date: g('date'),
+      }),
+    })
+      .catch(function (err) { console.error('Booking email failed to send', err); })
+      .then(function () {
+        if (submitBtn) submitBtn.disabled = false;
+        form.reset();
+        showThanks();
+      });
+  });
+})();
+</script>
 </x-dc>
 </body>
 </html>
