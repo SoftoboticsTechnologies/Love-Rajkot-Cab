@@ -22,10 +22,11 @@
 .fleet-card .fleet-content{display:flex!important;flex:1 1 auto!important;min-height:0!important;padding:22px!important;color:#142235!important}
 .fleet-card h4,.fleet-card p,.fleet-card dt,.fleet-card dd,.fleet-card span{visibility:visible!important;color:#142235!important;opacity:1!important;line-height:1.35!important}
 .fleet-card h4{font-size:21px!important}.fleet-card p{color:#65758a!important;font-size:12px!important}
-.fleet-card dl{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0 16px!important;margin:14px 0 16px!important;border:0!important}
-.fleet-card dl>div{display:flex!important;min-height:36px!important;padding:8px 0!important;border-bottom:1px solid #e6edf2!important}
-.fleet-card dl>div:first-child{grid-column:1/-1!important;padding:11px 13px!important;border:0!important;border-radius:12px!important;background:#eaf1ff!important}
-.fleet-card dt{color:#718096!important;font-size:12px!important}.fleet-card dd{font-size:13px!important;font-weight:800!important}.fleet-card dl>div:first-child dd{color:#2563eb!important;font-size:17px!important}
+.fleet-card dl{display:grid!important;grid-template-columns:1fr!important;gap:0!important;margin:14px 0 16px!important;border:0!important}
+.fleet-card dl>div{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:36px!important;padding:8px 0!important;border-bottom:1px solid #e6edf2!important}
+.fleet-card dt{display:flex!important;align-items:center!important;gap:10px!important;color:#718096!important;font-size:12px!important}
+.fleet-card dt .dt-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:26px!important;height:26px!important;flex:none!important;border-radius:50%!important;background:var(--color-accent)!important;color:#fff!important}
+.fleet-card dd{font-size:13px!important;font-weight:800!important}
 .fleet-card .btn{min-height:43px!important;padding:10px 11px!important;border-radius:11px!important;font-size:11px!important}
 @media(max-width:900px){.fleet-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:600px){.fleet-grid{grid-template-columns:1fr!important}.fleet-card .fleet-image{height:215px!important;min-height:215px!important}.fleet-card dl{grid-template-columns:1fr!important}}
 </style>
@@ -47,16 +48,22 @@
         <p style="margin:0 0 16px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;font-weight:600">{{ car.seats }}</p>
         <dl style="margin:0 0 20px;display:grid;gap:0;border-top:1px solid var(--color-divider)">
           <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
-            <dt style="opacity:.6">Rate per km</dt>
-            <dd style="margin:0;font-family:var(--font-heading);font-weight:800;color:var(--color-accent-700)">{{ car.rate }}</dd>
+            <dt style="opacity:.85;font-weight:600">
+              <span class="dt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"></circle><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"></path><path d="M17 8h4M19 6v4"></path></svg></span>
+              Sitting Capacity:
+            </dt>
+            <dd style="margin:0;font-weight:600">{{ car.capacity }}</dd>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+            <dt style="opacity:.85;font-weight:600">
+              <span class="dt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="12" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg></span>
+              Luggage Option:
+            </dt>
+            <dd style="margin:0;font-weight:600">{{ car.luggage }}</dd>
           </div>
           <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
             <dt style="opacity:.6">Minimum km</dt>
             <dd style="margin:0;font-weight:600">{{ car.minKm }}</dd>
-          </div>
-          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
-            <dt style="opacity:.6">Driver allowance</dt>
-            <dd style="margin:0;font-weight:600">{{ car.driver }}</dd>
           </div>
           <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px">
             <dt style="opacity:.6">Toll &amp; parking</dt>
@@ -68,9 +75,14 @@
             Book Now
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
           </a>
-          <a href="tel:+918160260322" class="btn" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;gap:10px;border:2px solid var(--color-divider)" style-hover="border-color:var(--color-accent);color:var(--color-accent)">
-            Call for fare
-          </a>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:6px">
+            <a href="tel:+918160260322" class="btn" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;border:2px solid var(--color-divider)" style-hover="border-color:var(--color-accent);color:var(--color-accent)">
+              Call for fare
+            </a>
+            <a href="{{ car.wa }}" target="_blank" rel="noopener" class="btn" aria-label="Chat on WhatsApp" style="padding:13px;width:46px;background:#25D366;border:2px solid #25D366" style-hover="background:#1EBE5B;border-color:#1EBE5B">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.9-.95 1.09-.17.2-.35.21-.65.07-.3-.15-1.13-.42-2.15-1.33-.79-.71-1.32-1.58-1.47-1.88-.15-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.68-1.63-.93-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1.01-1.03 2.46 0 1.45 1.05 2.85 1.2 3.05.15.2 2.06 3.28 5.06 4.47.71.28 1.26.45 1.69.58.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z"></path><path d="M12.02 2C6.5 2 2.03 6.47 2.03 11.99c0 1.76.46 3.42 1.27 4.86L2 22.5l5.79-1.51a9.94 9.94 0 0 0 4.23.95h.01c5.51 0 9.99-4.48 9.99-10S17.53 2 12.02 2Zm0 18.13h-.01a8.2 8.2 0 0 1-3.9-1l-.28-.16-3.44.9.92-3.35-.18-.29a8.1 8.1 0 0 1-1.25-4.34 8.15 8.15 0 0 1 8.15-8.14c2.18 0 4.22.85 5.76 2.39a8.09 8.09 0 0 1 2.38 5.76 8.15 8.15 0 0 1-8.15 8.14Z"></path></svg>
+            </a>
+          </div>
         </div>
       </div>
     </article>
@@ -79,17 +91,17 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:760},&quot;slotPrefix&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;fleet&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 const FLEET = [
-  { name: 'Swift Dzire', seats: 'Sedan · 4 + 1 seater · AC', rate: '₹11 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.8' },
-  { name: 'Honda Amaze', seats: 'Sedan · 4 + 1 seater · AC', rate: '₹11 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.7' },
-  { name: 'Ertiga', seats: 'SUV · 6 + 1 seater · AC', rate: '₹13 / km', minKm: '300 km per day', driver: '₹500 per day', rating: '4.7' },
-  { name: 'Innova Crysta', seats: 'SUV · 6 + 1 seater · AC', rate: '₹18 / km', minKm: '300 km per day', driver: '₹600 per day', rating: '4.8' },
-  { name: 'Tempo Traveller', seats: 'Van · 13 + 1 seater · AC', rate: '₹30 / km', minKm: '250 km per day', driver: '₹600 per day', rating: '4.6' },
-  { name: 'Urbania (New)', seats: 'Van · 17 + 1 seater · AC', rate: '₹35 / km', minKm: '250 km per day', driver: '₹700 per day', rating: '4.9' },
+  { name: 'Maruti Suzuki Dzire', seats: 'Sedan · 4 + 1 seater · AC', capacity: '4 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.8' },
+  { name: 'Honda Amaze', seats: 'Sedan · 4 + 1 seater · AC', capacity: '4 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.7' },
+  { name: 'Maruti Suzuki Ertiga', seats: 'SUV · 6 + 1 seater · AC', capacity: '6 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.7' },
+  { name: 'Toyota Innova Crysta', seats: 'SUV · 6 + 1 seater · AC', capacity: '6 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.8' },
+  { name: 'Tempo Traveller', seats: 'Van · 13 + 1 seater · AC', capacity: '13 People', luggage: 'Yes', minKm: '250 km per day', rating: '4.6' },
+  { name: 'Chevrolet Tavera', seats: 'Van · 9 + 1 seater · AC', capacity: '9 People', luggage: 'Yes', minKm: '250 km per day', rating: '4.9' },
 ];
 
 const MEDIA = [
   {
-    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Dzire/12186/1771935643542/front-left-side-47.jpg",
+    "src": "images/cars/dzire.jpeg",
     "credit": "",
     "href": ""
   },
@@ -99,22 +111,22 @@ const MEDIA = [
     "href": ""
   },
   {
-    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Maruti/Ertiga/10288/1755776579514/front-left-side-47.jpg",
+    "src": "images/cars/ertiga.jpeg",
     "credit": "",
     "href": ""
   },
   {
-    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Toyota/Innova-Crysta/11703/1780562393141/front-left-side-47.jpg",
+    "src": "images/cars/innova.jpeg",
     "credit": "",
     "href": ""
   },
   {
-    "src": "https://buscdn.cardekho.com/in/force/traveller-3050/force-traveller-3050.jpg",
+    "src": "images/cars/force%20traveller.jpeg",
     "credit": "",
     "href": ""
   },
   {
-    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Force/Urbania/11849/1763466348855/front-left-side-47.jpg",
+    "src": "https://stimg.cardekho.com/car-images/carexteriorimages/930x620/Chevrolet/Chevrolet-Tavera/front-view-118.jpg",
     "credit": "",
     "href": ""
   }
