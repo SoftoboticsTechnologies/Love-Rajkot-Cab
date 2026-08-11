@@ -25,7 +25,7 @@
 .fleet-card dl{display:grid!important;grid-template-columns:1fr!important;gap:0!important;margin:14px 0 16px!important;border:0!important}
 .fleet-card dl>div{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:36px!important;padding:8px 0!important;border-bottom:1px solid #e6edf2!important}
 .fleet-card dt{display:flex!important;align-items:center!important;gap:10px!important;color:#718096!important;font-size:12px!important}
-.fleet-card dt .dt-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:26px!important;height:26px!important;flex:none!important;border-radius:50%!important;background:var(--color-accent)!important;color:#fff!important}
+.fleet-card dt .dt-icon{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:26px!important;height:26px!important;flex:none!important;border-radius:50%!important;background:var(--color-accent)!important;color:#1a1a1a!important}
 .fleet-card dd{font-size:13px!important;font-weight:800!important}
 .fleet-card .btn{min-height:43px!important;padding:10px 11px!important;border-radius:11px!important;font-size:11px!important}
 @media(max-width:900px){.fleet-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}@media(max-width:600px){.fleet-grid{grid-template-columns:1fr!important}.fleet-card .fleet-image{height:215px!important;min-height:215px!important}.fleet-card dl{grid-template-columns:1fr!important}}
@@ -54,20 +54,12 @@
             </dt>
             <dd style="margin:0;font-weight:600">{{ car.capacity }}</dd>
           </div>
-          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px">
             <dt style="opacity:.85;font-weight:600">
               <span class="dt-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="12" height="13" rx="2"></rect><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg></span>
               Luggage Option:
             </dt>
             <dd style="margin:0;font-weight:600">{{ car.luggage }}</dd>
-          </div>
-          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--color-divider);font-size:13.5px">
-            <dt style="opacity:.6">Minimum km</dt>
-            <dd style="margin:0;font-weight:600">{{ car.minKm }}</dd>
-          </div>
-          <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:13.5px">
-            <dt style="opacity:.6">Toll &amp; parking</dt>
-            <dd style="margin:0;font-weight:600">Extra, as actual</dd>
           </div>
         </dl>
         <div style="margin-top:auto;display:grid;gap:2px">
@@ -76,7 +68,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
           </a>
           <div style="display:grid;grid-template-columns:1fr auto;gap:6px">
-            <a href="tel:+918160260322" class="btn" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;border:2px solid var(--color-divider)" style-hover="border-color:var(--color-accent);color:var(--color-accent)">
+            <a href="tel:+918160260322" class="btn" style="padding:13px 16px;font-size:13px;letter-spacing:.07em;text-transform:uppercase;border:2px solid var(--color-divider)" style-hover="border-color:var(--color-accent);color:var(--color-accent-800)">
               Call for fare
             </a>
             <a href="{{ car.wa }}" target="_blank" rel="noopener" class="btn" aria-label="Chat on WhatsApp" style="padding:13px;width:46px;background:#25D366;border:2px solid #25D366" style-hover="background:#1EBE5B;border-color:#1EBE5B">
@@ -91,12 +83,12 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:760},&quot;slotPrefix&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;fleet&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 const FLEET = [
-  { name: 'Maruti Suzuki Dzire', seats: 'Sedan · 4 + 1 seater · AC', capacity: '4 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.8' },
-  { name: 'Honda Amaze', seats: 'Sedan · 4 + 1 seater · AC', capacity: '4 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.7' },
-  { name: 'Maruti Suzuki Ertiga', seats: 'SUV · 6 + 1 seater · AC', capacity: '6 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.7' },
-  { name: 'Toyota Innova Crysta', seats: 'SUV · 6 + 1 seater · AC', capacity: '6 People', luggage: 'Yes', minKm: '300 km per day', rating: '4.8' },
-  { name: 'Tempo Traveller', seats: 'Van · 13 + 1 seater · AC', capacity: '13 People', luggage: 'Yes', minKm: '250 km per day', rating: '4.6' },
-  { name: 'Chevrolet Tavera', seats: 'Van · 9 + 1 seater · AC', capacity: '9 People', luggage: 'Yes', minKm: '250 km per day', rating: '4.9' },
+  { name: 'Maruti Suzuki Dzire', seats: 'Sedan · AC', capacity: '4 + 1', luggage: 'Yes', rating: '4.8' },
+  { name: 'Honda Amaze', seats: 'Sedan · AC', capacity: '4 + 1', luggage: 'Yes', rating: '4.7' },
+  { name: 'Maruti Suzuki Ertiga', seats: 'SUV · AC', capacity: '6 + 1', luggage: 'Yes', rating: '4.7' },
+  { name: 'Toyota Innova Crysta', seats: 'SUV · AC', capacity: '6 + 1', luggage: 'Yes', rating: '4.8' },
+  { name: 'Tempo Traveller', seats: 'Van · AC', capacity: '13 + 1', luggage: 'Yes', rating: '4.6' },
+  { name: 'Chevrolet Tavera', seats: 'Van · AC', capacity: '9 + 1', luggage: 'Yes', rating: '4.9' },
 ];
 
 const MEDIA = [
@@ -106,7 +98,7 @@ const MEDIA = [
     "href": ""
   },
   {
-    "src": "https://stimg.cardekho.com/images/carexteriorimages/930x620/Honda/Amaze/12185/1755764679476/front-left-side-47.jpg",
+    "src": "images/cars/honda-amaze.png",
     "credit": "",
     "href": ""
   },
@@ -126,7 +118,7 @@ const MEDIA = [
     "href": ""
   },
   {
-    "src": "https://stimg.cardekho.com/car-images/carexteriorimages/930x620/Chevrolet/Chevrolet-Tavera/front-view-118.jpg",
+    "src": "images/cars/tavera.png",
     "credit": "",
     "href": ""
   }
