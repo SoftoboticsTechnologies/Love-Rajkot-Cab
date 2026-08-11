@@ -97,10 +97,36 @@
 .taxi-book-field input::placeholder { color:#9aa8b8; }
 .taxi-book-field input:focus-visible, .taxi-book-field select:focus-visible { outline:0; border-color:var(--color-accent); box-shadow:0 0 0 4px rgba(255,199,44,.20); }
 .taxi-book-field .field-icon { position:absolute; right:14px; top:50%; transform:translateY(-50%); width:18px; height:18px; color:#9aa8b8; pointer-events:none; }
+.taxi-book-field input[type="date"]::-webkit-calendar-picker-indicator { opacity:0; position:absolute; right:0; width:42px; height:100%; margin:0; }
 .taxi-book-actions { display:flex; justify-content:flex-end; margin-top:22px; }
 .taxi-book-actions .btn-primary { padding:15px 30px!important; font-size:13px!important; letter-spacing:.07em!important; text-transform:uppercase!important; gap:10px!important; }
 @media (max-width:900px) { .taxi-book-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:560px) { .taxi-book-grid { grid-template-columns:1fr; } .taxi-book-wrap { margin-top:-40px; } .taxi-book-actions { justify-content:stretch; } .taxi-book-actions .btn-primary { width:100%; } }
+@media (max-width:560px) {
+  .home-hero-extras { padding-left:12px !important; padding-right:12px !important; }
+  /* Break the card out of every ancestor's padding/max-width by sizing off the
+     viewport directly (100vw), then re-centering with the standard full-bleed
+     margin formula (50% of own box minus 50vw) so ancestor padding/centering
+     can't shrink it back down. */
+  .taxi-book-wrap {
+    width:calc(100vw - 24px) !important;
+    max-width:none !important;
+    margin-left:calc(50% - 50vw + 12px) !important;
+    margin-right:calc(50% - 50vw + 12px) !important;
+    box-sizing:border-box !important;
+    margin-top:-40px;
+  }
+  .taxi-book-card { padding:20px 18px; border-radius:20px; box-sizing:border-box; }
+  .taxi-book-grid { grid-template-columns:1fr; gap:14px; }
+  .taxi-book-card h3 { font-size:19px; margin-bottom:16px; }
+  .taxi-book-field label { font-size:12px; margin-bottom:6px; }
+  .taxi-book-field input, .taxi-book-field select { height:46px; border-radius:10px; font-size:13.5px; }
+  .taxi-book-actions { justify-content:stretch; margin-top:16px; }
+  .taxi-book-actions .btn-primary { width:100%; padding:14px 20px!important; }
+}
+@media (max-width:380px) {
+  .taxi-book-wrap { width:calc(100vw - 16px) !important; margin-left:calc(50% - 50vw + 8px) !important; margin-right:calc(50% - 50vw + 8px) !important; margin-top:-24px; }
+  .taxi-book-card { padding:18px 16px; }
+}
 
 .taxi-book-thanks-overlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(13,20,34,.6); backdrop-filter:blur(4px); }
 .taxi-book-thanks-card { position:relative; width:min(100%,420px); background:#fff; color:#17263a; border-radius:22px; padding:40px 32px 32px; text-align:center; box-shadow:0 30px 70px rgba(8,15,30,.35); }
@@ -150,7 +176,7 @@
           </div>
         </div>
         <div class="hero-slide" id="hero-slide-4">
-          <div class="hero-slide-bg" aria-hidden="true"><image-slot id="home-hero-slide-4" fit="cover" src="images/dzire banner.jpeg" placeholder="Drop a wide taxi photo"></image-slot></div>
+          <div class="hero-slide-bg" aria-hidden="true" style="background:#0b1c2f"><image-slot id="home-hero-slide-4" fit="contain" src="images/dzire banner.jpeg" placeholder="Drop a wide taxi photo"></image-slot></div>
           <div class="hero-slide-scrim"></div>
           <a href="#hero-slide-3" class="hero-carousel-arrow hero-carousel-arrow-prev" aria-label="Previous slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg></a>
           <a href="#hero-slide-2" class="hero-carousel-arrow hero-carousel-arrow-next" aria-label="Next slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></a>
@@ -244,24 +270,6 @@
               </button>
             </div>
           </form>
-        </div>
-      </div>
-      <div data-cols="4" style="margin-top:clamp(48px,6vw,80px);gap:0;border-top:2px solid var(--color-divider);border-bottom:2px solid var(--color-divider)">
-        <div style="padding:22px 24px 22px 0;border-right:1px solid var(--color-divider)">
-          <h5 style="margin:0 0 4px;font-size:15px">Verified drivers</h5>
-          <p style="margin:0;font-size:13px;opacity:.6">Licensed and background checked</p>
-        </div>
-        <div style="padding:22px 24px;border-right:1px solid var(--color-divider)">
-          <h5 style="margin:0 0 4px;font-size:15px">24 &times; 7 dispatch</h5>
-          <p style="margin:0;font-size:13px;opacity:.6">Night flights and early trains</p>
-        </div>
-        <div style="padding:22px 24px;border-right:1px solid var(--color-divider)">
-          <h5 style="margin:0 0 4px;font-size:15px">Local drivers</h5>
-          <p style="margin:0;font-size:13px;opacity:.6">Saurashtra roads by heart</p>
-        </div>
-        <div style="padding:22px 0 22px 24px">
-          <h5 style="margin:0 0 4px;font-size:15px">Sedan to Traveller</h5>
-          <p style="margin:0;font-size:13px;opacity:.6">Four seats up to fourteen</p>
         </div>
       </div>
     </section>
