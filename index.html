@@ -555,20 +555,18 @@
       'Pickup: ' + g('pickup') + '\n' +
       'Drop: ' + g('drop') + '\n' +
       'Date: ' + g('date');
-    window.location.href = 'mailto:Loverajkot05@gmail.com?subject=' + encodeURIComponent('New Taxi Booking Request') + '&body=' + encodeURIComponent(mailBody);
-    fetch('https://formsubmit.co/ajax/Loverajkot05@gmail.com', {
+    fetch('https://k5iewetbri.execute-api.ap-south-1.amazonaws.com/prod/contact', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        _subject: 'New Taxi Booking Request',
-        _template: 'table',
-        Name: g('name'),
-        Phone: g('phone'),
-        Email: g('email'),
-        Vehicle: g('vehicle'),
-        Pickup: g('pickup'),
-        Drop: g('drop'),
-        Date: g('date'),
+        subject: 'New Taxi Booking Request',
+        name: g('name'),
+        phone: g('phone'),
+        email: g('email'),
+        vehicle: g('vehicle'),
+        pickup: g('pickup'),
+        drop: g('drop'),
+        date: g('date'),
       }),
     })
       .catch(function (err) { console.error('Booking email failed to send', err); })
